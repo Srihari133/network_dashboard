@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Devices - NetMonitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-network-wired"></i>
+                    <span>NetMonitor</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Overview</a></li>
+                    <li><a href="devices.html" class="active"><i class="fas fa-server"></i> Devices</a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i> Network Traffic</a></li>
+                    <li><a href="#"><i class="fas fa-shield-alt"></i> Security</a></li>
+                    <li><a href="#"><i class="fas fa-exclamation-triangle"></i> Alerts</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h1>Network Devices</h1>
+                    <div class="breadcrumb">
+                        <span>Dashboard</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Devices</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="connection-status" id="connectionStatus">
+                        <i class="fas fa-circle"></i>
+                        <span>Connected</span>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" placeholder="Search devices..." id="deviceSearch">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://via.placeholder.com/40" alt="User">
+                        <span>Admin User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Device Stats Overview -->
+            <section class="device-stats-grid">
+                <div class="stat-card device-total">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalDevices">156</h3>
+                        <p>Total Devices</p>
+                        <span class="stat-change positive">+3 today</span>
+                    </div>
+                </div>
+                <div class="stat-card device-online">
+                    <div class="stat-icon">
+                        <i class="fas fa-circle" style="color: #22c55e;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="onlineDevices">142</h3>
+                        <p>Online</p>
+                        <span class="stat-change positive">91.0%</span>
+                    </div>
+                </div>
+                <div class="stat-card device-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="warningDevices">8</h3>
+                        <p>Warning</p>
+                        <span class="stat-change negative">+2 today</span>
+                    </div>
+                </div>
+                <div class="stat-card device-offline">
+                    <div class="stat-icon">
+                        <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="offlineDevices">6</h3>
+                        <p>Offline</p>
+                        <span class="stat-change positive">-1 today</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Device Management Tools -->
+            <section class="device-tools">
+                <div class="tools-left">
+                    <button class="btn btn-primary" id="discoverDevices">
+                        <i class="fas fa-search"></i>
+                        Discover Devices
+                    </button>
+                    
+                </div>
+                <div class="tools-right">
+                    <div class="filter-group">
+                        <select id="statusFilter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="online">Online</option>
+                            <option value="warning">Warning</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                        <select id="typeFilter" class="filter-select">
+                            <option value="all">All Types</option>
+                            <option value="router">Router</option>
+                            <option value="switch">Switch</option>
+                            <option value="server">Server</option>
+                            <option value="workstation">Workstation</option>
+                            <option value="printer">Printer</option>
+                            <option value="iot">IoT Device</option>
+                        </select>
+                        <select id="groupFilter" class="filter-select">
+                            <option value="all">All Groups</option>
+                            <option value="critical">Critical</option>
+                            <option value="production">Production</option>
+                            <option value="development">Development</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Device Grid/List -->
+            <section class="devices-container">
+                <div class="devices-grid" id="devicesGrid">
+                    <!-- Device cards will be populated by JavaScript -->
+                </div>
+                
+                <div class="devices-list hidden" id="devicesList">
+                    <div class="list-header">
+                        <div class="list-controls">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="selectAll">
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+                        <div class="list-columns">
+                            <span class="col-device">Device</span>
+                            <span class="col-status">Status</span>
+                            <span class="col-type">Type</span>
+                            <span class="col-ip">IP Address</span>
+                            <span class="col-ping">Ping</span>
+                            <span class="col-uptime">Uptime</span>
+                            <span class="col-actions">Actions</span>
+                        </div>
+                    </div>
+                    <div class="list-body" id="devicesListBody">
+                        <!-- Device list items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Showing <span id="showingStart">1</span> to <span id="showingEnd">20</span> of <span id="totalItems">156</span> devices
+                </div>
+                <div class="pagination">
+                    <button class="page-btn" id="prevPage" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="page-numbers" id="pageNumbers">
+                        <!-- Page numbers will be generated by JavaScript -->
+                    </div>
+                    <button class="page-btn" id="nextPage">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Device Details Modal -->
+    <div class="modal" id="deviceModal">
+        <div class="modal-content device-modal">
+            <div class="modal-header">
+                <h2 id="deviceModalTitle">Device Details</h2>
+                <button class="modal-close" id="closeDeviceModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="device-details-tabs">
+                    <button class="tab-btn active" data-tab="overview">Overview</button>
+                    <button class="tab-btn" data-tab="performance">Performance</button>
+                    <button class="tab-btn" data-tab="configuration">Configuration</button>
+                    <button class="tab-btn" data-tab="security">Security</button>
+                </div>
+                
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane active" id="overviewTab">
+                        <div class="device-overview-grid">
+                            <div class="overview-section">
+                                <h3>Basic Information</h3>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Device Name:</label>
+                                        <span id="deviceName">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>IP Address:</label>
+                                        <span id="deviceIP">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>MAC Address:</label>
+                                        <span id="deviceMAC">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Device Type:</label>
+                                        <span id="deviceType">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Manufacturer:</label>
+                                        <span id="deviceManufacturer">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Status:</label>
+                                        <span id="deviceStatus" class="status-badge">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="overview-section">
+                                <h3>Network Information</h3>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>Subnet:</label>
+                                        <span id="deviceSubnet">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Gateway:</label>
+                                        <span id="deviceGateway">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>DNS:</label>
+                                        <span id="deviceDNS">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Ports:</label>
+                                        <span id="devicePorts">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Last Seen:</label>
+                                        <span id="deviceLastSeen">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Uptime:</label>
+                                        <span id="deviceUptime">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Tab -->
+                    <div class="tab-pane" id="performanceTab">
+                        <div class="performance-metrics">
+                            <div class="metric-card">
+                                <h4>Response Time</h4>
+                                <div class="metric-value" id="devicePing">-</div>
+                                <div class="metric-chart" id="pingChart"></div>
+                            </div>
+                            <div class="metric-card">
+                                <h4>Bandwidth Usage</h4>
+                                <div class="metric-value" id="deviceBandwidth">-</div>
+                                <div class="metric-chart" id="bandwidthChart"></div>
+                            </div>
+                            <div class="metric-card">
+                                <h4>Packet Loss</h4>
+                                <div class="metric-value" id="devicePacketLoss">-</div>
+                                <div class="metric-chart" id="packetLossChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuration Tab -->
+                    <div class="tab-pane" id="configurationTab">
+                        <div class="config-section">
+                            <h4>Device Configuration</h4>
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>Device Name:</label>
+                                    <input type="text" id="configDeviceName" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Group:</label>
+                                    <select id="configDeviceGroup" class="form-select">
+                                        <option value="critical">Critical</option>
+                                        <option value="production">Production</option>
+                                        <option value="development">Development</option>
+                                        <option value="guest">Guest</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Monitoring Interval:</label>
+                                    <select id="configMonitoringInterval" class="form-select">
+                                        <option value="30">30 seconds</option>
+                                        <option value="60">1 minute</option>
+                                        <option value="300">5 minutes</option>
+                                        <option value="900">15 minutes</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="configEnableAlerts">
+                                        Enable Alerts
+                                    </label>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" id="saveConfig">Save Configuration</button>
+                                    <button class="btn btn-secondary" id="resetConfig">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Tab -->
+                    <div class="tab-pane" id="securityTab">
+                        <div class="security-section">
+                            <h4>Security Information</h4>
+                            <div class="security-grid">
+                                <div class="security-item">
+                                    <label>Security Status:</label>
+                                    <span class="security-status" id="securityStatus">Secure</span>
+                                </div>
+                                <div class="security-item">
+                                    <label>Open Ports:</label>
+                                    <span id="openPorts">22, 80, 443</span>
+                                </div>
+                                <div class="security-item">
+                                    <label>Vulnerabilities:</label>
+                                    <span id="vulnerabilities">None detected</span>
+                                </div>
+                                <div class="security-item">
+                                    <label>Last Security Scan:</label>
+                                    <span id="lastSecurityScan">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="security-actions">
+                                <button class="btn btn-secondary" id="runSecurityScan">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Run Security Scan
+                                </button>
+                                <button class="btn btn-secondary" id="portScan">
+                                    <i class="fas fa-search"></i>
+                                    Port Scan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="pingDevice">
+                    <i class="fas fa-satellite-dish"></i>
+                    Ping Device
+                </button>
+                <button class="btn btn-secondary" id="traceRoute">
+                    <i class="fas fa-route"></i>
+                    Trace Route
+                </button>
+                <button class="btn btn-danger" id="removeDevice">
+                    <i class="fas fa-trash"></i>
+                    Remove Device
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Device Modal -->
+    <div class="modal" id="addDeviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Device</h2>
+                <button class="modal-close" id="closeAddDeviceModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addDeviceForm">
+                    <div class="form-group">
+                        <label>Device Name:</label>
+                        <input type="text" id="newDeviceName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>IP Address:</label>
+                        <input type="text" id="newDeviceIP" class="form-input" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Device Type:</label>
+                        <select id="newDeviceType" class="form-select" required>
+                            <option value="">Select Type</option>
+                            <option value="router">Router</option>
+                            <option value="switch">Switch</option>
+                            <option value="server">Server</option>
+                            <option value="workstation">Workstation</option>
+                            <option value="printer">Printer</option>
+                            <option value="iot">IoT Device</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Group:</label>
+                        <select id="newDeviceGroup" class="form-select">
+                            <option value="production">Production</option>
+                            <option value="development">Development</option>
+                            <option value="critical">Critical</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <textarea id="newDeviceDescription" class="form-textarea" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveNewDevice">
+                    <i class="fas fa-save"></i>
+                    Add Device
+                </button>
+                <button class="btn btn-secondary" id="cancelAddDevice">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Modal -->
+    <div class="modal" id="bulkActionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bulk Actions</h2>
+                <button class="modal-close" id="closeBulkActionsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="bulk-actions-list">
+                    <button class="bulk-action-btn" data-action="ping">
+                        <i class="fas fa-satellite-dish"></i>
+                        Ping Selected Devices
+                    </button>
+                    <button class="bulk-action-btn" data-action="group">
+                        <i class="fas fa-layer-group"></i>
+                        Change Group
+                    </button>
+                    <button class="bulk-action-btn" data-action="monitor">
+                        <i class="fas fa-eye"></i>
+                        Enable/Disable Monitoring
+                    </button>
+                    <button class="bulk-action-btn" data-action="remove">
+                        <i class="fas fa-trash"></i>
+                        Remove Devices
+                    </button>
+                </div>
+                <div class="selected-count">
+                    <span id="selectedCount">0</span> devices selected
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="api-service.js"></script>
+    <script src="devices.js"></script>
+</body>
+</html> 
